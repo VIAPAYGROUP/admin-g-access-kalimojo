@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin Modern - G-ACCESS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        body { background-color: #03121e; color: #ffffff; padding: 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .admin-container { 
+            width: 100%; 
+            max-width: 480px; 
+            background: linear-gradient(145deg, #041a2c, #03121e); 
+            padding: 20px 16px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(38, 198, 218, 0.3); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        #loginSection {
+            width: 100%; max-width: 340px; margin: auto; display: flex; flex-direction: column; justify-content: center;
+        }
+
+        .admin-scrollable-body {
+            flex: 1; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
+        }
+
+        h3 { color: #26c6da; font-size: 18px; margin-bottom: 15px; text-align: center; font-weight: 700; letter-spacing: 0.5px; }
+        label { display: block; font-size: 11px; color: #a0aec0; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; }
+        
+        input, select { 
+            width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12); 
+            border-radius: 12px; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px; transition: all 0.2s ease; 
+        }
+        input:focus, select:focus { border-color: #26c6da; box-shadow: 0 0 10px rgba(38,198,218,0.25); }
+
+        .btn-modern { 
+            width: 100%; padding: 12px; border-radius: 12px; font-weight: bold; border: none; cursor: pointer; 
+            font-size: 13px; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px; 
+            transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+        }
+        .btn-modern:hover { transform: translateY(-2px); opacity: 0.95; }
+
+        .btn-quick-shortcut {
+            background: rgba(38, 198, 218, 0.12); border: 1px solid rgba(38, 198, 218, 0.4);
+            color: #26c6da; cursor: pointer; white-space: nowrap; font-weight: bold; transition: all 0.2s ease;
+        }
+        .btn-quick-shortcut:hover { background: #26c6da; color: #041a2c; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .admin-sticky-search {
+            background-color: #041a2c;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            padding-top: 10px;
+            padding-bottom: 5px;
+        }
+
+        /* TOMBOL FILTER ADMIN */
+        .filter-tags-admin { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 8px; }
+        .tag-admin {
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: #a0aec0;
+            padding: 6px 8px; border-radius: 12px; font-size: 11px; cursor: pointer; flex: 1; text-align: center;
+        }
+        .tag-admin.active { background-color: #006699; border-color: #26c6da; color: #ffffff; }
+
+        #admin-member-list { margin-top: 8px; padding-bottom: 20px; }
+        
+        .admin-card-item {
+            background: linear-gradient(145deg, #05233c, #041c30); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; padding: 14px; margin-bottom: 12px; font-size: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        .admin-card-item:hover { border-color: rgba(38, 198, 218, 0.3); }
+
+        .card-header-admin { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .profile-area-admin { display: flex; align-items: center; gap: 10px; }
+        .avatar-admin {
+            width: 36px; height: 36px; background-color: #ffffff; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; color: #041a2c; font-size: 13px; border: 2px solid #26c6da; flex-shrink: 0;
+        }
+        .member-info-admin h3 { font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 1px; text-align: left; }
+        .expiry-date-admin { font-size: 11px; color: #7f8c8d; background-color: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 8px; white-space: nowrap; }
+
+        .admin-details-grid { font-size: 12px; color: #a0aec0; line-height: 1.5; margin-bottom: 10px; padding-left: 46px; }
+        .admin-detail-row { display: flex; gap: 6px; }
+        .admin-detail-label { width: 50px; color: #4a5d6e; }
+        .admin-detail-val { color: #cdd9e2; }
+
+        .admin-footer-actions { display: flex; gap: 4px; margin-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px; flex-wrap: wrap; }
+        .btn-card-action { padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; flex: 1; text-align: center; }
+
+        /* TOMBOL FLOATING SCROLL NAIK-TURUN (BOTTOM 200PX) */
+        .scroll-floating-container {
+            position: fixed; bottom: 200px; right: 20px; display: flex; flex-direction: column; gap: 8px;
+            z-index: 999999; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .scroll-floating-container.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .btn-scroll {
+            width: 40px; height: 40px; background: linear-gradient(135deg, rgba(5, 35, 60, 0.9), rgba(4, 26, 44, 0.95));
+            border: 1px solid rgba(38, 198, 218, 0.4); color: #26c6da; border-radius: 12px; display: flex;
+            justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            font-size: 14px; backdrop-filter: blur(6px); transition: all 0.25s ease;
+        }
+        .btn-scroll:hover { background: #26c6da; color: #03121e; transform: translateY(-2px) scale(1.05); }
+
+        #custom-input-modal, #preview-modal, #confirm-modal, #payment-modal { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(3, 18, 30, 0.85); display: none; justify-content: center; align-items: center; 
+            z-index: 999999; padding: 15px; backdrop-filter: blur(5px); 
+        }
+
+        .custom-modal-box, .modal-content { 
+            background: #041a2c; width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; 
+            border: 1px solid rgba(38, 198, 218, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+        }
+        .modal-content textarea { 
+            width: 100%; height: 180px; background: rgba(0,0,0,0.4); color: #fff; border: 1px solid rgba(255,255,255,0.2); 
+            border-radius: 10px; padding: 12px; font-size: 12px; font-family: monospace; resize: none; margin-bottom: 14px; outline: none; 
+        }
+        .modal-buttons { display: flex; flex-direction: column; gap: 8px; }
+        .modal-row-btn { display: flex; gap: 8px; width: 100%; }
+        .modal-buttons button { flex: 1; padding: 11px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; font-size: 12px; }
+
+        #toast-notification { 
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-50px); 
+            background: #2ecc71; color: #03121e; padding: 12px 24px; border-radius: 30px; font-weight: bold; 
+            font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 99999999; 
+        }
+        #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div id="toast-notification">Berhasil!</div>
+
+<div id="confirm-modal">
+    <div class="custom-modal-box" style="text-align: center;">
+        <h3 style="color: #ff6b6b; margin-bottom: 8px;">Konfirmasi Hapus</h3>
+        <p id="confirm-modal-desc" style="font-size: 13px; color: #a0aec0; margin-bottom: 20px; line-height: 1.4;">Apakah Anda yakin ingin menghapus member ini?</p>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-modern" style="background: rgba(255,255,255,0.08); color: #a0aec0; flex: 1;" onclick="closeConfirmModal(false)">Batal</button>
+            <button class="btn-modern" style="background: #e74c3c; color: #fff; flex: 1;" onclick="closeConfirmModal(true)">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+<div id="payment-modal">
+    <div class="custom-modal-box">
+        <h3 style="color: #26c6da; margin-bottom: 8px; text-align: center;">Konfirmasi Pembayaran</h3>
+        <p id="payment-modal-desc" style="font-size: 12px; color: #a0aec0; margin-bottom: 12px; text-align: center; line-height: 1.4;">Masukkan jumlah bulan yang ingin dibayarkan:</p>
+        <input type="number" id="payment-modal-input" value="1" min="1" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 16px; text-align: center; outline: none; margin-bottom: 15px; font-weight: bold;">
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-modern" style="background: rgba(255,255,255,0.08); color: #a0aec0; flex: 1;" onclick="tutupPaymentModal(false)">Batal</button>
+            <button class="btn-modern" style="background: #2ecc71; color: #fff; flex: 1;" onclick="tutupPaymentModal(true)">Proses Lunas</button>
+        </div>
+    </div>
+</div>
+
+<div id="custom-input-modal">
+    <div class="custom-modal-box">
+        <h3 id="custom-modal-title" style="margin-bottom: 8px; color: #26c6da; text-align: center;">No WhatsApp Kosong</h3>
+        <p id="custom-modal-desc" style="font-size: 12px; color: #a0aec0; margin-bottom: 14px; text-align: center;">Masukkan nomor WhatsApp pelanggan (Contoh: 62812...):</p>
+        <input type="text" id="custom-modal-input" value="62" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 15px; text-align: center; outline: none; margin-bottom: 15px; font-weight: bold;">
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-modern" style="background: rgba(255,255,255,0.08); color: #a0aec0; flex: 1;" onclick="tutupCustomModal(false)">Batal</button>
+            <button class="btn-modern" style="background: #26c6da; color: #041a2c; flex: 1;" onclick="tutupCustomModal(true)">Simpan & Kirim</button>
+        </div>
+    </div>
+</div>
+
+<div id="preview-modal">
+    <div class="modal-content">
+        <h3 id="modal-title-text" style="color: #26c6da; text-align: center; margin-bottom: 10px;">Pratinjau Pesan</h3>
+        <textarea id="previewText"></textarea>
+        <div class="modal-buttons">
+            <div class="modal-row-btn" id="rawbtPrintRow">
+                <button style="background: #ff9800; color: #fff;" onclick="cetakKeRawBT()">🖨️ Cetak RawBT</button>
+            </div>
+            <div class="modal-row-btn">
+                <button style="background: #25D366; color: #fff;" onclick="kirimKeWaFinal()">💬 Kirim WhatsApp</button>
+                <button style="background: #e74c3c; color: #fff;" onclick="tutupModalStruk()">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-container">
+    <div id="loginSection">
+        <h3>🔐 Login Akses Admin</h3>
+        <div style="margin-top: 15px;"><label>Username</label><input type="text" id="adminUser" placeholder="Masukkan Username..."></div>
+        <div><label>Password</label><input type="password" id="adminPass" placeholder="Masukkan Password..."></div>
+        <button class="btn-modern" style="background: #26c6da; color: #041a2c;" onclick="prosesLoginAdmin()">Masuk Panel</button>
+    </div>
+
+    <div id="panelSection" style="display: none; height: 100%; flex-direction: column;">
+        <div class="admin-scrollable-body" id="adminScrollArea">
+            <h3 id="form-title">Kelola Member G-ACCESS</h3>
+            
+            <button id="btn-toggle-form" class="btn-modern" style="background: rgba(38, 198, 218, 0.15); border: 1px dashed #26c6da; color: #26c6da; margin-bottom: 12px;" onclick="bukaFormTambah()">➕ Buka Form Tambah Member</button>
+
+            <div id="form-wrapper" style="display: none;">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div class="grid-2">
+                    <div><label>ID Singkat</label><input type="text" id="memberId" placeholder="AN"></div>
+                    <div><label>Nama Lengkap</label><input type="text" id="memberName" placeholder="Nama"></div>
+                </div>
+                <div class="grid-2">
+                    <div><label>Paket</label><input type="text" id="memberPaket" value="Reguler"></div>
+                    <div><label>Harga (Rp)</label><input type="number" id="memberHarga" value="110000"></div>
+                </div>
+                <div class="grid-2">
+                    <div><label>No WhatsApp</label><input type="text" id="memberWa" placeholder="62812..."></div>
+                    <div><label>Alamat</label><input type="text" id="memberAlamat" placeholder="Area"></div>
+                </div>
+                <div class="grid-2">
+                    <div>
+                        <label>Bulan Tagihan</label>
+                        <select id="memberBulan">
+                            <option value="1">1 - Januari</option><option value="2">2 - Februari</option><option value="3">3 - Maret</option>
+                            <option value="4">4 - April</option><option value="5">5 - Mei</option><option value="6">6 - Juni</option>
+                            <option value="7">7 - Juli</option><option value="8">8 - Agustus</option><option value="9">9 - September</option>
+                            <option value="10">10 - Oktober</option><option value="11">11 - November</option><option value="12">12 - Desember</option>
+                        </select>
+                    </div>
+                    <div><label>Tahun Tagihan</label><input type="number" id="memberTahun" value="2026"></div>
+                </div>
+                <div>
+                    <label>Status Override (Custom Admin)</label>
+                    <select id="memberStatusCustom">
+                        <option value="normal">Normal (Otomatis)</option>
+                        <option value="paksa_online">Paksa Tetap Online</option>
+                        <option value="paksa_offline">Paksa Offline / Isolir</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Link Info Pembayaran (Untuk Struk Tagihan)</label>
+                    <input type="text" id="adminBayarLink" value="https://vpayndo.blogspot.com/p/pembayaran-tagihan.html" placeholder="https://...">
+                </div>
+                <div>
+                    <label>Link Cek Masa Aktif (Untuk Struk Lunas)</label>
+                    <input type="text" id="adminAktifLink" value="https://vpayndo.blogspot.com/p/daftar-pelanggan-internet-area-kalimojo.html" placeholder="https://...">
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-modern" style="background: #2ecc71; color: #fff;" onclick="saveMember()">💾 Simpan Data</button>
+                    <button class="btn-modern" style="background: rgba(255,255,255,0.08); color: #a0aec0;" onclick="tutupFormAdmin()">❌ Tutup Form</button>
+                </div>
+                <button class="btn-modern" style="background: #3498db; color: #fff;" onclick="syncKeGoogleSheets()">☁️ Sinkronkan ke Server</button>
+                <button class="btn-modern" style="background: #9b59b6; color: #fff;" onclick="tarikDataDariGoogleSheets()">Tarik Data dari Server</button>
+
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:18px 0 0 0;">
+            </div>
+
+            <!-- KOTAK PENCARIAN & TOMBOL FILTER STATUS -->
+            <div class="admin-sticky-search">
+                <div class="filter-tags-admin" id="adminFilterTags">
+                    <button class="tag-admin active" onclick="filterAdminStatus('semua', event)">Semua</button>
+                    <button class="tag-admin" onclick="filterAdminStatus('aktif', event)">Aktif</button>
+                    <button class="tag-admin" onclick="filterAdminStatus('telat', event)">Telat Bayar</button>
+                    <button class="tag-admin" onclick="filterAdminStatus('nonaktif', event)">Nonaktif</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="adminSearch" placeholder="🔍 Cari Nama / Alamat..." onkeypress="handleAdminSearch(event)" style="margin-bottom: 0; flex: 1;">
+                    <button class="btn-quick-shortcut" onclick="renderAdminTable()" style="padding: 0 16px; border-radius: 12px; font-size: 13px;">Cari</button>
+                </div>
+            </div>
+
+            <div id="admin-member-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOMBOL FLOATING SCROLL NAIK-TURUN (BOTTOM 200PX) -->
+<div class="scroll-floating-container" id="scrollFloatingBtn">
+    <button class="btn-scroll" onclick="document.getElementById('adminScrollArea').scrollTo({top: 0, behavior: 'smooth'})" title="Gulir ke Atas">▲</button>
+    <button class="btn-scroll" onclick="document.getElementById('adminScrollArea').scrollTo({top: document.getElementById('adminScrollArea').scrollHeight, behavior: 'smooth'})" title="Gulir ke Bawah">▼</button>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxX8MY0T2QOKoOCvxLrjKN77gLIgGLjfIb2jKCaTiMmx-tJLo7ASdD9sgQ2vnDGohXS/exec";
+    const defaultMembers = [{ id: "MB", name: "Member Baru", paket: "Reguler", harga: 110000, wa: "", alamat: "Pager Sengon KaliMojo", bulanTagihan: 8, tahunTagihan: 2026, statusCustom: "normal" }];
+    let globalActiveWa = "", globalActiveIndex = -1, deleteTargetIndex = -1, activePaymentIndex = -1;
+    let currentAdminFilter = 'semua';
+
+    function showToast(msg) {
+        let t = document.getElementById('toast-notification');
+        t.innerText = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function getMembersData() {
+        let stored = localStorage.getItem('jegeg_json_kalimojo');
+        if (!stored) { localStorage.setItem('jegeg_json_kalimojo', JSON.stringify(defaultMembers)); stored = JSON.stringify(defaultMembers); }
+        return JSON.parse(stored);
+    }
+
+    function prosesLoginAdmin() {
+        let user = document.getElementById('adminUser').value.trim();
+        let pass = document.getElementById('adminPass').value.trim();
+        if (user === "Admin" && pass === "admin123") {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('panelSection').style.display = 'flex';
+            
+            let container = document.querySelector('.admin-container');
+            container.style.height = "calc(100vh - 32px)";
+            container.style.justifyContent = "flex-start";
+
+            renderAdminTable();
+            showToast("✨ Login Admin Berhasil!");
+        } else { 
+            showToast("⚠️ Username atau Password salah!"); 
+        }
+    }
+
+    function handleAdminSearch(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            renderAdminTable();
+        }
+    }
+
+    function filterAdminStatus(status, event) {
+        let tags = document.querySelectorAll('#adminFilterTags .tag-admin');
+        tags.forEach(tag => tag.classList.remove('active'));
+        event.target.classList.add('active');
+
+        currentAdminFilter = status;
+        renderAdminTable();
+    }
+
+    function renderAdminTable() {
+        let members = getMembersData();
+        let container = document.getElementById('admin-member-list');
+        let search = document.getElementById('adminSearch').value.toLowerCase().trim();
+        
+        const hariIni = new Date();
+
+        container.innerHTML = '';
+        members.forEach((member, index) => {
+            const mBulan = parseInt(member.bulanTagihan) || 8;
+            const mTahun = parseInt(member.tahunTagihan) || 2026;
+            
+            const tanggalJatuhTempo = new Date(mTahun, mBulan - 1, 20);
+            const selisihWaktu = tanggalJatuhTempo - hariIni;
+            const selisihHari = Math.ceil(selisihWaktu / (1000 * 60 * 60 * 24));
+
+            let status = 'aktif', labelHari = `${selisihHari} Hari Lagi`;
+            
+            if (selisihHari < 0) {
+                if (Math.abs(selisihHari) <= 30) {
+                    status = 'telat'; labelHari = `Telat ${Math.abs(selisihHari)} Hari`;
+                } else {
+                    status = 'nonaktif'; labelHari = 'Blokir (Isolir)';
+                }
+            }
+
+            if (member.statusCustom === 'paksa_online') {
+                status = 'telat';
+                if (selisihHari < 0) {
+                    labelHari = `Telat ${Math.abs(selisihHari)} Hari (Override Admin)`;
+                } else {
+                    labelHari = `${selisihHari} Hari Lagi (Override Admin)`;
+                }
+            } else if (member.statusCustom === 'paksa_offline') {
+                status = 'nonaktif';
+                labelHari = 'Blokir (Dipaksa Admin)';
+            }
+
+            const matchStatus = (currentAdminFilter === 'semua' || status === currentAdminFilter);
+            const matchSearch = (!search || member.name.toLowerCase().includes(search) || member.alamat.toLowerCase().includes(search) || (member.id && member.id.toLowerCase().includes(search)));
+
+            if (matchStatus && matchSearch) {
+                const tglFormatted = tanggalJatuhTempo.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                container.innerHTML += `
+                    <div class="admin-card-item">
+                        <div class="card-header-admin">
+                            <div class="profile-area-admin">
+                                <div class="avatar-admin" style="${status === 'telat' ? 'background-color:#f1c40f; color:#041a2c;' : status === 'nonaktif' ? 'background-color:#e74c3c; color:#fff;' : ''}">${member.id}</div>
+                                <div class="member-info-admin">
+                                    <h3>${member.name}</h3>
+                                </div>
+                            </div>
+                            <div class="expiry-date-admin">Tempo: ${tglFormatted}</div>
+                        </div>
+                        <div class="admin-details-grid">
+                            <div class="admin-detail-row"><span class="admin-detail-label">Paket</span><span class="admin-detail-val">: ${member.paket} (Rp ${(member.harga||110000).toLocaleString('id-ID')})</span></div>
+                            <div class="admin-detail-row"><span class="admin-detail-label">Alamat</span><span class="admin-detail-val">: ${member.alamat}</span></div>
+                            <div class="admin-detail-row"><span class="admin-detail-label">Status</span><span class="admin-detail-val">: <b style="color: ${status==='aktif'?'#2ecc71':status==='telat'?'#f1c40f':'#e74c3c'};">${labelHari}</b></span></div>
+                        </div>
+                        <div class="admin-footer-actions">
+                            <button class="btn-card-action" style="background:#3498db; color:#fff;" onclick="prosesBayar(${index})">✅ Lunas</button>
+                            <button class="btn-card-action" style="background:#25D366; color:#fff;" onclick="bukaPreviewTagihan(${index})">💬 Tagih</button>
+                            <button class="btn-card-action" style="background:#f1c40f; color:#000;" onclick="editMember(${index})">Edit</button>
+                            <button class="btn-card-action" style="background:#e74c3c; color:#fff;" onclick="deleteMember(${index})">Hapus</button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    function saveMember() {
+        let id = document.getElementById('memberId').value.trim();
+        let name = document.getElementById('memberName').value.trim().toUpperCase();
+        let paket = document.getElementById('memberPaket').value.trim();
+        let harga = parseFloat(document.getElementById('memberHarga').value) || 110000;
+        let wa = document.getElementById('memberWa').value.trim();
+        let alamat = document.getElementById('memberAlamat').value.trim();
+        let bulanTagihan = parseInt(document.getElementById('memberBulan').value);
+        let tahunTagihan = parseInt(document.getElementById('memberTahun').value);
+        let statusCustom = document.getElementById('memberStatusCustom').value;
+        let editIndex = parseInt(document.getElementById('editIndex').value);
+
+        if (!id || !name || !alamat) { 
+            showToast("⚠️ Data utama (ID, Nama, Alamat) wajib diisi!"); 
+            return; 
+        }
+
+        let members = getMembersData();
+
+        if (editIndex === -1) {
+            let isDuplicate = members.some(m => 
+                m.id.trim().toUpperCase() === id.toUpperCase() && 
+                m.name.trim().toUpperCase() === name && 
+                m.alamat.trim().toLowerCase() === alamat.toLowerCase()
+            );
+            if (isDuplicate) {
+                showToast(`⚠️ Gagal: Member "${name}" (${id}) sudah ada!`);
+                return;
+            }
+        }
+
+        let newData = { id, name, paket, harga, wa, alamat, bulanTagihan, tahunTagihan, statusCustom };
+        if (editIndex === -1) {
+            members.push(newData);
+        } else {
+            members[editIndex] = newData;
+        }
+
+        localStorage.setItem('jegeg_json_kalimojo', JSON.stringify(members));
+        
+        let customBayarLink = document.getElementById('adminBayarLink').value.trim() || "https://vpayndo.blogspot.com/p/pembayaran-tagihan.html";
+        let customAktifLink = document.getElementById('adminAktifLink').value.trim() || "https://vpayndo.blogspot.com/p/daftar-pelanggan-internet-area-kalimojo.html";
+        localStorage.setItem('jegeg_bayar_link', customBayarLink);
+        localStorage.setItem('jegeg_aktif_link', customAktifLink);
+
+        syncKeGoogleSheets();
+        resetFormAdmin(); 
+        renderAdminTable(); 
+        showToast("💾 Data Berhasil Disimpan Tanpa Dobel!");
+    }
+
+    function editMember(index) {
+        let m = getMembersData()[index];
+        document.getElementById('memberId').value = m.id;
+        document.getElementById('memberName').value = m.name;
+        document.getElementById('memberPaket').value = m.paket;
+        document.getElementById('memberHarga').value = m.harga || 110000;
+        document.getElementById('memberWa').value = m.wa || '';
+        document.getElementById('memberAlamat').value = m.alamat;
+        document.getElementById('memberBulan').value = m.bulanTagihan;
+        document.getElementById('memberTahun').value = m.tahunTagihan;
+        document.getElementById('memberStatusCustom').value = m.statusCustom || 'normal';
+
+        let savedBayarLink = localStorage.getItem('jegeg_bayar_link') || "https://bayar-jegegnet-online.netlify.app/";
+        let savedAktifLink = localStorage.getItem('jegeg_aktif_link') || "https://jegegnet-masaaktif-kalimojo.netlify.app/";
+        document.getElementById('adminBayarLink').value = savedBayarLink;
+        document.getElementById('adminAktifLink').value = savedAktifLink;
+
+        document.getElementById('editIndex').value = index;
+        document.getElementById('form-title').innerText = "Edit Data Member";
+        
+        document.getElementById('form-wrapper').style.display = 'block';
+        document.getElementById('btn-toggle-form').style.display = 'none';
+        document.getElementById('form-title').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deleteMember(index) {
+        let members = getMembersData();
+        let target = members[index];
+        deleteTargetIndex = index;
+        document.getElementById('confirm-modal-desc').innerText = `Apakah Anda yakin ingin menghapus member "${target.name}" (${target.id})?`;
+        document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    function closeConfirmModal(isYes) {
+        document.getElementById('confirm-modal').style.display = 'none';
+        if (isYes && deleteTargetIndex !== -1) {
+            let members = getMembersData();
+            members.splice(deleteTargetIndex, 1);
+            localStorage.setItem('jegeg_json_kalimojo', JSON.stringify(members));
+            syncKeGoogleSheets();
+            renderAdminTable(); 
+            showToast("️Data Berhasil Dihapus!");
+        }
+        deleteTargetIndex = -1;
+    }
+
+    function resetFormAdmin() {
+        document.getElementById('memberId').value = ''; 
+        document.getElementById('memberName').value = '';
+        document.getElementById('memberAlamat').value = ''; 
+        document.getElementById('editIndex').value = '-1';
+        document.getElementById('memberStatusCustom').value = 'normal';
+        document.getElementById('form-title').innerText = "Kelola Member G-ACCESS";
+        
+        document.getElementById('form-wrapper').style.display = 'none';
+        document.getElementById('btn-toggle-form').style.display = 'flex';
+    }
+
+    function bukaFormTambah() {
+        resetFormAdmin();
+        document.getElementById('form-wrapper').style.display = 'block';
+        document.getElementById('btn-toggle-form').style.display = 'none';
+        document.getElementById('form-title').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function tutupFormAdmin() {
+        document.getElementById('form-wrapper').style.display = 'none';
+        document.getElementById('btn-toggle-form').style.display = 'flex';
+        resetFormAdmin();
+    }
+
+    function prosesBayar(index) {
+        let members = getMembersData();
+        let m = members[index];
+        activePaymentIndex = index;
+        globalActiveIndex = index;
+        
+        let jmlTunggakan = hitungTunggakan(m);
+        
+        document.getElementById('payment-modal-desc').innerHTML = `Pelanggan: <b>${m.name}</b><br>Rekomendasi tunggakan berjalan: <b style="color: #26c6da;">${jmlTunggakan} Bulan</b>`;
+        document.getElementById('payment-modal-input').value = jmlTunggakan;
+        
+        document.getElementById('payment-modal').style.display = 'flex';
+        setTimeout(() => {
+            let inp = document.getElementById('payment-modal-input');
+            inp.focus();
+            inp.select();
+        }, 100);
+    }
+
+    function tutupPaymentModal(isConfirm) {
+        let modal = document.getElementById('payment-modal');
+        modal.style.display = 'none';
+        
+        if (!isConfirm || activePaymentIndex === -1) {
+            activePaymentIndex = -1;
+            return;
+        }
+
+        let inputVal = document.getElementById('payment-modal-input').value.trim();
+        let jmlBayarBulan = parseInt(inputVal);
+        
+        if (isNaN(jmlBayarBulan) || jmlBayarBulan < 1) {
+            showToast("⚠️ Jumlah bulan tidak valid!");
+            activePaymentIndex = -1;
+            return;
+        }
+
+        let members = getMembersData();
+        let m = members[activePaymentIndex];
+        document.getElementById('rawbtPrintRow').style.display = 'block';
+        
+        let hargaSatuan = m.harga ? parseInt(m.harga) : 110000;
+        let totalBayar = jmlBayarBulan * hargaSatuan;
+        
+        let bulanLunasAngka = parseInt(m.bulanTagihan);
+        let tahunLunasAngka = parseInt(m.tahunTagihan);
+        
+        const namaBulanArr = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        
+        let periodeLunasTeks = `${namaBulanArr[bulanLunasAngka]} ${tahunLunasAngka}`;
+        if (jmlBayarBulan > 1) {
+            let totalAkhirBulan = (tahunLunasAngka * 12) + bulanLunasAngka + jmlBayarBulan - 1;
+            let akhirBulanAngka = totalAkhirBulan % 12 || 12;
+            let akhirTahunAngka = Math.floor(totalAkhirBulan / 12);
+            if (akhirBulanAngka === 12 && totalAkhirBulan % 12 !== 0) akhirTahunAngka -= 1;
+            periodeLunasTeks = `${namaBulanArr[bulanLunasAngka]} ${tahunLunasAngka} s.d ${namaBulanArr[akhirBulanAngka]} ${akhirTahunAngka}`;
+        }
+        
+        let totalBulanTagihanLama = (tahunLunasAngka * 12) + bulanLunasAngka;
+        let newTotalBulan = totalBulanTagihanLama + jmlBayarBulan;
+        m.tahunTagihan = Math.floor(newTotalBulan / 12);
+        m.bulanTagihan = newTotalBulan % 12 || 12;
+        if (m.bulanTagihan === 12 && newTotalBulan % 12 !== 0) m.tahunTagihan -= 1;
+        
+        localStorage.setItem('jegeg_json_kalimojo', JSON.stringify(members));
+        syncKeGoogleSheets();
+        
+        let jatuhTempoBerikutnyaTeks = `${namaBulanArr[parseInt(m.bulanTagihan)]} ${m.tahunTagihan}`;
+        let tglSekarang = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        
+        let linkAktifStruk = localStorage.getItem('jegeg_aktif_link') || "https://vpayndo.blogspot.com/p/daftar-pelanggan-internet-area-kalimojo.html";
+
+        let pesanLunas = `*BUKTI PEMBAYARAN BERHASIL*
+*G-ACCESS INTERNET*
+----------------------------------------
+Terima kasih, pembayaran Anda telah diterima oleh Admin.
+----------------------------------------
+Data Pelanggan:
+- ID: ${m.id}
+- Nama: *${m.name}*
+- Alamat: ${m.alamat}
+----------------------------------------
+Rincian Transaksi:
+- Paket: ${m.paket}
+- Periode Lunas: *${periodeLunasTeks}*
+- Periode Bayar: ${jmlBayarBulan} Bulan
+- Nominal Bayar: *Rp ${totalBayar.toLocaleString('id-ID')}*
+- Tagihan berikutnya jatuh tempo pada: ${jatuhTempoBerikutnyaTeks}
+----------------------------------------
+Cek Masa Aktif Paket:
+${linkAktifStruk}
+
+_Terima kasih telah berlangganan di G-ACCESS!_`;
+        
+        globalActiveWa = m.wa ? m.wa.toString().trim() : '';
+        document.getElementById('modal-title-text').innerText = "Pratinjau Struk Pembayaran Berhasil";
+        document.getElementById('previewText').value = pesanLunas;
+        document.getElementById('preview-modal').style.display = 'flex';
+        renderAdminTable();
+        activePaymentIndex = -1;
+    }
+
+    function bukaPreviewTagihan(index) {
+        let members = getMembersData();
+        let m = members[index];
+        globalActiveIndex = index;
+        globalActiveWa = m.wa ? m.wa.toString().trim() : '';
+
+        let linkBayarStruk = localStorage.getItem('jegeg_bayar_link') || "https://vpayndo.blogspot.com/p/pembayaran-tagihan.html";
+
+        document.getElementById('rawbtPrintRow').style.display = 'block';
+
+        let jml = hitungTunggakan(m);
+        let hargaSatuan = m.harga ? parseInt(m.harga) : 110000;
+        let totalTagihan = jml * hargaSatuan;
+        
+        const namaBulanArr = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let periodeTeks = `${namaBulanArr[parseInt(m.bulanTagihan)]} ${m.tahunTagihan}`;
+
+        let pesanTagihan = `*INFORMASI TAGIHAN INTERNET G-ACCESS*
+----------------------------------------
+Yth. Bpk/Ibu: *${m.name}*
+ID: (${m.id})
+Alamat: ${m.alamat}
+----------------------------------------
+Detail Tagihan:
+- Paket: ${m.paket}
+- Periode: ${periodeTeks}
+- Jumlah Tunggakan: ${jml} Bulan
+- Total Tagihan: *Rp ${totalTagihan.toLocaleString('id-ID')}*
+----------------------------------------
+[ ! ] Batas Pembayaran: Tanggal 20 Setiap Bulan
+
+Silakan melakukan pembayaran CASH ke Admin Area atau melalui link Online Resmi:
+${linkBayarStruk}
+
+_Terima kasih telah menggunakan layanan G-ACCESS_`;
+
+        document.getElementById('modal-title-text').innerText = "Pratinjau Tagihan Internet";
+        document.getElementById('previewText').value = pesanTagihan;
+        document.getElementById('preview-modal').style.display = 'flex';
+    }
+
+    function kirimKeWaFinal() {
+        let members = getMembersData();
+        if (globalActiveIndex !== -1 && members[globalActiveIndex]) {
+            let activeMember = members[globalActiveIndex];
+            globalActiveWa = activeMember.wa ? activeMember.wa.toString().trim() : '';
+        }
+
+        if (!globalActiveWa || globalActiveWa === "" || globalActiveWa.length < 5) {
+            document.getElementById('preview-modal').style.display = 'none';
+            document.getElementById('custom-modal-input').value = "62";
+            document.getElementById('custom-input-modal').style.display = 'flex';
+            setTimeout(() => {
+                let inp = document.getElementById('custom-modal-input');
+                inp.focus();
+                inp.setSelectionRange(inp.value.length, inp.value.length);
+            }, 100);
+        } else {
+            bukaUrlWa(document.getElementById('previewText').value);
+        }
+    }
+
+    function tutupCustomModal(isConfirm) {
+        let inputVal = document.getElementById('custom-modal-input').value.trim();
+        document.getElementById('custom-input-modal').style.display = 'none';
+        
+        if (isConfirm && inputVal && inputVal !== "62" && inputVal.length > 3) {
+            let members = getMembersData();
+            
+            if (globalActiveIndex !== -1 && members[globalActiveIndex]) {
+                members[globalActiveIndex].wa = inputVal;
+                localStorage.setItem('jegeg_json_kalimojo', JSON.stringify(members));
+                syncKeGoogleSheets();
+                renderAdminTable();
+                showToast("✅ Nomor WA berhasil disimpan!");
+            }
+            
+            let teksFinal = document.getElementById('previewText').value;
+            let urlWa = `https://wa.me/${inputVal}?text=` + encodeURIComponent(teksFinal);
+            window.location.href = urlWa;
+            tutupModalStruk();
+        } else if (isConfirm) {
+            showToast("⚠️ Masukkan nomor WhatsApp dengan benar.");
+            document.getElementById('preview-modal').style.display = 'flex';
+        } else {
+            document.getElementById('preview-modal').style.display = 'flex';
+        }
+    }
+
+    function tutupModalStruk() { 
+        document.getElementById('preview-modal').style.display = 'none'; 
+        activePaymentIndex = -1;
+        globalActiveIndex = -1;
+    }
+
+    function bukaUrlWa(teksFinal) {
+        let urlWa = `https://wa.me/${globalActiveWa}?text=` + encodeURIComponent(teksFinal);
+        window.open(urlWa, '_blank');
+        tutupModalStruk();
+    }
+
+    function cetakKeRawBT() {
+        let teksStruk = document.getElementById('previewText').value;
+        if (!teksStruk) {
+            showToast("⚠️ Tidak ada teks struk.");
+            return;
+        }
+
+        let bersihTeks = teksStruk.replace(/\*/g, '');
+        bersihTeks = bersihTeks.replace(/_/g, '');
+
+        bersihTeks = bersihTeks.replace(/Batas Pembayaran: Tanggal 20 Setiap Bulan/g, "Batas Pembayaran: Tanggal 20 Setiap Bulan\n(KONFIRMASI: 083845002120)\n");
+
+        let linkOnline = localStorage.getItem('jegeg_bayar_link') || "https://vpayndo.blogspot.com/p/pembayaran-tagihan.html";
+        let infoPembayaran = "Silakan melakukan pembayaran CASH ke Admin Area atau melalui link bayar online resmi kami:\n" + linkOnline;
+        bersihTeks = bersihTeks.replace(/Silakan melakukan pembayaran[\s\S]*?vpayndo\.blogspot\.com\/p\/pembayaran-tagihan\.html/g, infoPembayaran);
+
+        let headerStruk = 
+              "\x1B\x61\x01" + 
+              "================================\n" +
+              "\x1B\x21\x30" +
+              " G-ACCESS \n" +
+              "\x1B\x21\x00" +
+              "   High Speed Internet Service  \n" +
+              "================================\n" +
+              "\x1B\x61\x00";
+
+        let footerStruk = "\n--------------------------------\n" + 
+                          "\x1B\x61\x01" + 
+                          "\x1B\x21\x01" + 
+                          "Powered: PT. GAIATRI LINTAS NUSANTARA" + 
+                          "\x1B\x21\x00" + 
+                          "\x1B\x61\x00";
+
+        let finalStruk = headerStruk + bersihTeks + footerStruk;
+        
+        finalStruk = finalStruk.replace(/STRUK TAGIHAN INTERNET G-ACCESS/g, '\x1B\x45\x01STRUK TAGIHAN INTERNET G-ACCESS\x1B\x45\x00');
+        finalStruk = finalStruk.replace(/(Yth\. Bpk\/Ibu:\s+)([^\n]+)/gi, '$1\x1B\x45\x01$2\x1B\x45\x00');
+        finalStruk = finalStruk.replace(/(ID:\s+)([^\n]+)/gi, '$1\x1B\x45\x01$2\x1B\x45\x00');
+        finalStruk = finalStruk.replace(/(Terima kasih telah menggunakan layanan G\-ACCESS[^]*)/gi, '\x1B\x34\x01$1\x1B\x34\x00');
+
+        window.location.href = "rawbt:" + encodeURIComponent(finalStruk);
+    }
+
+    function syncKeGoogleSheets() {
+        let members = getMembersData();
+        showToast("Menyinkronkan ke server...");
+        fetch(WEB_APP_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(members) })
+        .then(() => showToast("✅ Berhasil Disinkronkan ke Server!"))
+        .catch(err => showToast("❌ Gagal sinkronisasi."));
+    }
+
+    function tarikDataDariGoogleSheets() {
+        showToast("Menarik data dari server...");
+        fetch(WEB_APP_URL)
+        .then(response => response.json())
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                let formattedData = data.map(item => ({
+                    id: item.id || item.ID || "",
+                    name: item.name || item.Nama || item.NAMA || "",
+                    paket: item.paket || item.Paket || "Reguler",
+                    harga: parseFloat(item.harga || item.Harga) || 110000,
+                    wa: item.wa || item.WA || item.WhatsApp || "",
+                    alamat: item.alamat || item.Alamat || "",
+                    bulanTagihan: parseInt(item.bulanTagihan || item.BulanTagihan) || 8,
+                    tahunTagihan: parseInt(item.tahunTagihan || item.TahunTagihan) || 2026,
+                    statusCustom: item.statusCustom || item.StatusCustom || "normal"
+                }));
+
+                localStorage.setItem('jegeg_json_kalimojo', JSON.stringify(formattedData));
+                renderAdminTable();
+                showToast("✅ Berhasil menarik " + formattedData.length + " data member!");
+            } else {
+                showToast("⚠️ Data di server kosong atau format tidak sesuai.");
+            }
+        })
+        .catch(err => {
+            showToast("❌ Gagal menarik data. Periksa koneksi.");
+            console.error(err);
+        });
+    }
+
+    function hitungTunggakan(m) {
+        const sekarang = new Date();
+        const totalBulanTagihan = (parseInt(m.tahunTagihan) * 12) + parseInt(m.bulanTagihan);
+        const totalBulanSekarang = (sekarang.getFullYear() * 12) + (sekarang.getMonth() + 1);
+        let selisih = totalBulanSekarang - totalBulanTagihan + 1;
+        return selisih < 1 ? 1 : selisih;
+    }
+
+    // Tombol Floating Scroll Naik-Turun Admin Area
+    let adminScrollArea = document.getElementById('adminScrollArea');
+    if (adminScrollArea) {
+        adminScrollArea.addEventListener('scroll', function() {
+            let floatingBtn = document.getElementById('scrollFloatingBtn');
+            if (floatingBtn) {
+                if (adminScrollArea.scrollTop > 100) floatingBtn.classList.add('show');
+                else floatingBtn.classList.remove('show');
+            }
+        });
+    }
+</script>
+</body>
+</html>
